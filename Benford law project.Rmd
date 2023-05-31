@@ -1,0 +1,128 @@
+---
+
+---
+
+
+
+Background:
+The election-iran-2009.csv dataset contains the actual results of the 2009 Iranian presidential elections that Mahmoud Ahmadinejad won. Following this election, there were wide-spread allegations about voter fraud resulting in protests by millions of people. Your job is to apply Benford's Law to find out if there was fraud in the elections.
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# Seeing what is in the environment
+rm(list=ls())
+```
+
+
+```{r}
+# Storing data
+data <- read.csv(file.choose())
+
+# Inspecting data
+#view(data)
+str(data)
+summary(data)
+
+# Checking column classes
+sapply(data,class)
+
+# Extracting positions of NA values
+which(is.na(data),arr.ind = TRUE)
+```
+
+
+```{r}
+# Searching for loaded packages
+search()
+
+# Issue 1: wrong data type
+
+# Finding columns that are subject to change
+cols.num <- c("Ahmadinejad", "Rezai", "Karrubi", "Mousavi", "Total.votes", "Invalid.votes", "Valid.votes", "Eligible.voters")
+
+# Changing columns' classes using apply
+data[,cols.num] <- apply(data[,cols.num],2, function(x) as.numeric(gsub(",","",x)))
+
+# Issue 2: confusing column names
+
+# Renaming columns
+names(data)[names(data)=="X."] <- "Ahmadinejad_%"
+names(data)[names(data)=="X..1"] <- "Rezai_%"
+names(data)[names(data)=="X..2"] <- "Karrubi_%"
+names(data)[names(data)=="X..3"] <- "Mousavi_%"
+
+# Inspecting data
+str(data)
+summary(data)
+```
+
+
+```{r}
+# Loading libraries
+library(gtrendsR)
+library(reshape2)
+library(dplyr)
+library(benford.analysis)
+
+# Performing benford analysis
+
+# Ahmadinejad
+trend_Ahmadinejad <- benford(data$Ahmadinejad, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Ahmadinejad
+plot(trend_Ahmadinejad)
+
+# Rezai
+trend_Rezai <- benford(data$Rezai, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Rezai
+plot(trend_Rezai)
+
+# Karrubi
+trend_Karrubi <- benford(data$Karrubi, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Karrubi
+plot(trend_Karrubi)
+
+# Mousavi
+trend_Mousavi <- benford(data$Mousavi, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Mousavi
+plot(trend_Mousavi)
+
+# Total.votes
+trend_Total.votes <- benford(data$Total.votes, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Total.votes
+plot(trend_Total.votes)
+
+# Invalid.votes
+trend_Invalid.votes <- benford(data$Invalid.votes, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Invalid.votes
+plot(trend_Invalid.votes)
+
+# Valid.votes
+trend_Valid.votes <- benford(data$Valid.votes, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Valid.votes
+plot(trend_Valid.votes)
+
+# Eligible.voters
+trend_Eligible.voters <- benford(data$Eligible.voters, number.of.digits = 1, discrete = T, sign = "positive")
+trend_Eligible.voters
+plot(trend_Eligible.voters)
+
+# All votes in vector list_votes
+list_votes <- c(data$Ahmadinejad,data$Rezai,data$Karrubi,data$Mousavi,data$Total.votes,data$Invalid.votes,data$Valid.votes,data$Eligible.voters)
+trend_list_votes <- benford(list_votes, number.of.digits = 1, discrete = T, sign = "positive")
+trend_list_votes
+plot(trend_list_votes)
+```
+
+
+```{r}
+ 
+```
+
+
+
+
